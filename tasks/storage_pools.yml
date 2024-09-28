@@ -1,0 +1,26 @@
+---
+- name: Define storage pools
+  community.libvirt.virt_pool:
+    command: define
+    name: '{{ item.name }}'
+    xml: '{{ lookup("ansible.builtin.template", "storage_pool.xml.j2", template_vars=item) }}'
+  loop: '{{ kvm_storage_pools | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Activate storage pools
+  community.libvirt.virt_pool:
+    state: active
+    name: '{{ item.name }}'
+  loop: '{{ kvm_storage_pools | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Start storage pools at boot time
+  community.libvirt.virt_pool:
+    autostart: true
+    name: '{{ item.name }}'
+  loop: '{{ kvm_storage_pools | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+...

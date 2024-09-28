@@ -1,0 +1,26 @@
+---
+- name: Install KVM
+  ansible.builtin.import_tasks:
+    file: install.yml
+  tags: install
+
+- name: Import network tasks
+  ansible.builtin.import_tasks:
+    file: networks.yml
+  tags: networks
+
+- name: Import storage pool tasks
+  ansible.builtin.import_tasks:
+    file: storage_pools.yml
+  tags: storage_pools
+
+- name: Import storage volume tasks
+  ansible.builtin.import_tasks:
+    file: storage_volumes.yml
+  tags: storage_volumes
+
+- name: Import domain tasks
+  ansible.builtin.import_tasks:
+    file: domains.yml
+  tags: domains
+...

@@ -1,0 +1,128 @@
+<!--
+  https://libvirt.org/formatdomain.html
+-->
+{%- macro dict_to_xml(name, dict, ignore_list=[]) +%}
+<{{ name }}{% for k, v in dict|items if v is not mapping and k not in ignore_list %} {{ k }}='{{ v }}'{% endfor %}>
+  {%- for sub1_key, sub1_value in dict|items if sub1_value is mapping and sub1_key not in ignore_list +%}
+  <{{ sub1_key }}{% for k, v in sub1_value|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- for sub2_key, sub2_value in sub1_value|items if sub2_value is mapping +%}
+    <{{ sub2_key }}{% for k, v in sub2_value|items if v is not mapping%} {{ k }}='{{ v }}'{% endfor %}>
+      {%- for sub3_key, sub3_value in sub2_value|items if sub3_value is mapping +%}
+      <{{ sub3_key }}{% for k, v in sub3_value|items if v is not mapping%} {{ k }}='{{ v }}'{% endfor %}/>
+      {%- endfor +%}
+    </{{ sub2_key }}>
+    {%- endfor +%}
+  </{{ sub1_key }}>
+  {%- endfor +%}
+
+  {#- Check if there are ignored values that have to be handled separately and so also the closing root tag +#}
+  {%- if ignore_list|length == 0 +%}
+</{{ name }}>
+  {%- endif +%}
+{%- endmacro +%}
+
+<domain type='kvm'>
+  <!-- General Configuration -->
+  <name>{{ name }}</name>
+  {%- if title is defined +%}
+  <title>{{ title }}</title>
+  {%- endif +%}
+  {%- if description is defined +%}
+  <description>{{ description }}</description>
+  {%- endif +%}
+
+  <!-- Memory Configuration -->
+  {%- if maxMemory is defined +%}
+  <maxMemory unit='{{ maxMemory | regex_replace('\d*') }}'{% for k, v in maxMemory_options|items %} {{ k }}='{{ v }}'{% endfor %}>{{ maxMemory | regex_replace('\D*') }}</maxMemory>
+  {%- endif +%}
+  <memory unit='{{ memory | regex_replace('\d*') }}'{% for k, v in memory_options|items %} {{ k }}='{{ v }}'{% endfor %}>{{ memory | regex_replace('\D*') }}</memory>
+  {%- if currentMemory is defined +%}
+  <currentMemory unit='{{ currentMemory | regex_replace('\d*') }}'>{{ currentMemory | regex_replace('\D*') }}</currentMemory>
+  {%- endif +%}
+
+  <!-- vCPU Configuration -->
+  <vcpu{% for k, v in vcpu_options|items %} {{ k }}='{{ v }}'{% endfor %}>{{ vcpu }}</vcpu>
+  {%- if vcpus is defined +%}
+  <vcpus>
+    {%- for vpcu_item in vcpus +%}
+    <vcpu{% for k, v in vpcu_item|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endfor +%}
+  </vcpus>
+  {%- endif %}
+
+  <os>
+    <type arch='x86_64' machine='q35'>hvm</type>
+    <!-- Configure the boot order at device level! -->
+  </os>
+
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+
+  <cpu mode='host-passthrough' check='none' migratable='on'/>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+
+  <!-- Devices Configuration -->
+  <devices>
+  {%- if disks is defined +%}
+    {%- for disk in disks -%}
+    {{ dict_to_xml('disk', disk, ['readonly', 'shareable']) | indent(4) }}
+      {%- if disk.readonly is defined and disk.readonly +%}
+      <readonly/>
+      {%- endif +%}
+      {%- if disk.shareable is defined and disk.shareable +%}
+      <shareable/>
+      {%- endif +%}
+    </disk>
+    {%- endfor +%}
+  {%- endif +%}
+  {%- if filesystems is defined +%}
+    {%- for filesystem in filesystems -%}
+    {{ dict_to_xml('filesystem', filesystem, ['readonly']) | indent(4) }}
+      {%- if filesystem.readonly is defined and filesystem.readonly +%}
+      <readonly/>
+      {%- endif +%}
+    </filesystems>
+    {%- endfor +%}
+  {%- endif +%}
+  {%- if interfaces is defined +%}
+    {%- for interface in interfaces -%}
+    {{ dict_to_xml('interface', interface, ['alias']) | indent(4) }}
+        <alias name='ua-{{ name }}-nic{{ loop.index }}'/>
+    </interface>
+    {%- endfor +%}
+  {%- endif +%}
+    <controller type='usb' index='0' model='qemu-xhci'>
+      <alias name='usb'/>
+    </controller>
+    <controller type='sata' index='0'>
+      <alias name='ide'/>
+    </controller>
+    <controller type='virtio-serial' index='0'>
+      <alias name='virtio-serial0'/>
+    </controller>
+    <channel type='unix'>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+    </channel>
+    <input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+    <graphics type='vnc' port='-1' autoport='yes' listen='127.0.0.1'>
+      <listen type='address' address='127.0.0.1'/>
+    </graphics>
+    <video>
+      <model type='virtio' heads='1' primary='yes'/>
+    </video>
+    <watchdog model='itco' action='reset'/>
+    <memballoon model='virtio' />
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+    <console type='pty'>
+      <target type='serial'/>
+    </console>
+  </devices>
+</domain>

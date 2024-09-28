@@ -1,0 +1,67 @@
+<!--
+  https://libvirt.org/formatstorage.html#storage-volume-xml
+-->
+<volume>
+  <name>{{ name }}</name>
+  {%- if allocation is defined +%}
+  <allocation unit='{{ allocation | regex_replace('\d*') }}'>{{ allocation | regex_replace('\D*') }}</allocation>
+  {%- endif +%}
+  {%- if capacity is defined +%}
+  <capacity unit='{{ capacity | regex_replace('\d*') }}'>{{ capacity | regex_replace('\D*') }}</capacity>
+  {%- endif +%}
+  <target>
+    {%- if target.path is defined +%}
+    <path>{{ target.path }}</path>
+    {%- endif +%}
+    {%- if target.format is defined +%}
+    <format{% for k, v in target.format|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endif +%}
+    {%- if target.permissions is defined +%}
+    <permissions>
+      {%- for k, v in target.permissions|items +%}
+      <{{ k }}>{{ v }}</{{ k }}>
+      {%- endfor +%}
+    </permissions>
+    {%- endif +%}
+    {%- if target.encryption is defined +%}
+    <encryption{% for k, v in target.encryption|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}'>
+      {%- for sub1_key, sub1_value in target.encryption|items if sub1_value is mapping +%}
+      <{{ sub1_key }}{% for k, v in sub1_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
+      {%- endfor +%}
+    </encryption>
+    {%- endif +%}
+    {%- if target.compat is defined +%}
+    <compat>'{{ target.compat }}'</compat>
+    {%- endif +%}
+    {%- if target.nocow is defined and target.nocow +%}
+    </nocow>
+    {%- endif +%}
+    {%- if target.clusterSize is defined +%}
+    <clusterSize unit='{{ clusterSize | regex_replace('\d*') }}'>{{ clusterSize | regex_replace('\D*') }}</clusterSize>
+    {%- endif +%}
+    {%- if target.features is defined +%}
+    <features>
+      {%- for feature in target.features +%}
+      <{{ feature }}/>
+      {%- endfor +%}
+    </features>
+    {%- endif +%}
+  </target>
+  {%- if backingStore is defined +%}
+  <backingStore>
+    {%- if backingStore.path is defined +%}
+    <path>{{ backingStore.path }}</path>
+    {%- endif +%}
+    {%- if backingStore.format is defined +%}
+    <format{% for k, v in backingStore.format|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endif +%}
+    {%- if backingStore.permissions is defined +%}
+    <permissions>
+      {%- for k, v in backingStore.permissions|items +%}
+      <{{ k }}>{{ v }}</{{ k }}>
+      {%- endfor +%}
+    </permissions>
+    {%- endif +%}
+  </backingStore>
+  {%- endif +%}
+</volume>

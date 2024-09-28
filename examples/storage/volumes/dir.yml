@@ -1,0 +1,42 @@
+---
+#####
+# Volume format types for a file based (directory) storage pool examples
+#
+# These volume format types can also be used in:
+#   * Filesystem storage pools
+#   * Network Filesystem storage pools
+#####
+kvm_storage_volumes:
+  # Raw storage volume
+  - name: volume1.raw
+    pool: virtimages
+    capacity: 20G
+
+  # QCOW2 storage volume
+  - name: volume2.qcow2
+    pool: virtimages
+    capacity: 20G
+    target:
+      format:
+        type: qcow2
+        compat: 1.1
+
+  # QCOW2 storage volume which uses a backingstore image
+  - name: volume3.qcow2
+    pool: virtimages
+    capacity: 20G
+    target:
+      format:
+        type: qcow2
+        compat: 1.1
+    backingStore:
+      path: /var/lib/virt/images/back.qcow2
+      format:
+        type: qcow2
+
+  # Raw storage volume which copies content from another (QCOW2) image
+  - name: volume4.raw
+    pool: virtimages
+    from: /var/lib/virt/images/cloud-img.qcow2
+    capacity: 20G
+...

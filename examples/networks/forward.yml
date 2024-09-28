@@ -1,0 +1,97 @@
+---
+#####
+# Different physical LAN connection possibility examples
+#####
+kvm_networks:
+  # Isolated network, not connected to a physical LAN
+  - name: isolated
+    title: Isolated network
+    description: Isolated network
+    ipv6: 'yes'
+
+    # No forward element is specified, making this an isolated network
+
+    ip:
+      - family: ipv4
+        address: 192.168.123.1
+        netmask: 255.255.255.0
+        dhcp:
+          range:
+            start: 192.168.123.100
+            end: 192.168.123.200
+            lease: 60 # Minutes
+      - family: ipv6
+        address: 2001:db8:ca2:3::1
+        prefix: 64
+        dhcp:
+          range:
+            start: 2001:db8:ca2:3::10
+            end: 2001:db8:ca2:3::ff
+            lease: 60 # Minutes
+
+    domain:
+      name: example.com
+
+  # Routed network
+  - name: route
+    title: Routed network
+    description: Routed network
+    ipv6: 'yes'
+
+    forward:
+      mode: route
+
+    ip:
+      - family: ipv4
+        address: 192.168.124.1
+        netmask: 255.255.255.0
+        dhcp:
+          range:
+            start: 192.168.124.100
+            end: 192.168.124.200
+            lease: 60 # Minutes
+      - family: ipv6
+        address: 2001:db8:ca2:4::1
+        prefix: 64
+        dhcp:
+          range:
+            start: 2001:db8:ca2:4::10
+            end: 2001:db8:ca2:4::ff
+            lease: 60 # Minutes
+
+    domain:
+      name: example.com
+
+  # Hidden Network (outbound NAT)
+  - name: nat
+    title: NAT based network
+    description: NAT based network
+    ipv6: 'yes'
+
+    forward:
+      mode: nat
+      dev: eth0
+      nat:
+        ipv6: 'yes'
+
+    ip:
+      - family: ipv4
+        address: 192.168.125.1
+        netmask: 255.255.255.0
+        dhcp:
+          range:
+            start: 192.168.125.100
+            end: 192.168.125.200
+            lease: 60 # Minutes
+      - family: ipv6
+        address: 2001:db8:ca2:5::1
+        prefix: 64
+        dhcp:
+          range:
+            start: 2001:db8:ca2:5::10
+            end: 2001:db8:ca2:5::ff
+            lease: 60 # Minutes
+
+    domain:
+      name: example.com
+...

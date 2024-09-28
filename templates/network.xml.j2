@@ -1,0 +1,103 @@
+<!--
+  https://libvirt.org/formatnetwork.html
+-->
+<network{% if ipv6 is defined %} ipv6='{{ ipv6 }}'{% endif %}>
+  <!-- General -->
+  <name>{{ name }}</name>
+  {%- if title is defined +%}
+  <title>{{ title }}</title>
+  {%- endif +%}
+  {%- if description is defined +%}
+  <description>{{ description }}</description>
+  {%- endif +%}
+
+  <!-- Connectivity -->
+  {%- if bridge is defined +%}
+  <bridge{% for k, v in bridge|items %} {{ k }}='{{ v }}'{% endfor %}/>
+  {%- endif +%}
+  {%- if mtu is defined +%}
+  <mtu size='{{ mtu }}'/>
+  {%- endif +%}
+  {%- if domain is defined +%}
+  <domain{% for k, v in domain|items %} {{ k }}='{{ v }}'{% endfor %}/>
+  {%- endif +%}
+  {%- if forward is defined +%}
+  <forward{% for k, v in forward|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- for sub1_key, sub1_value in forward|items if sub1_value is mapping +%}
+    <{{ sub1_key }}{% for k, v in sub1_value|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+      {%- for sub2_key, sub2_value in sub1_value|items if sub2_value is mapping +%}
+      <{{ sub2_key }}{% for k, v in sub2_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
+      {%- endfor +%}
+    </{{ sub1_key }}>
+    {%- endfor +%}
+  </forward>
+  {%- endif +%}
+  {%- if port is defined +%}
+  <port{% for k, v in port|items %} {{ k }}='{{ v }}'{% endfor %}/>
+  {%- endif +%}
+
+  <!-- Quality Of Service -->
+  {%- if bandwidth is defined +%}
+  <bandwidth>
+    {%- for sub1_key, sub1_value in bandwidth|items +%}
+    <{{ sub1_key }}{% for k, v in sub1_value|items %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- endfor +%}
+  </bandwidth>
+  {%- endif +%}
+
+  <!-- Addressing -->
+  {%- if dns is defined +%}
+  <dns{% for k, v in dns|items if v is string %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- for dns_forwarder in dns.forwarder +%}
+    <forwarder{% for k, v in dns_forwarder|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endfor +%}
+    {%- for dns_txt in dns.txt +%}
+    <txt{% for k, v in dns_txt|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endfor +%}
+    {%- for dns_srv in dns.srv +%}
+    <srv{% for k, v in dns_srv|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endfor +%}
+    {%- for dns_hosts in dns.hosts +%}
+    <host{% for k, v in dns_hosts|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+      {%- for hostname in dns_hosts.hostname +%}
+      <hostname>{{ hostname }}</hostname>
+      {%- endfor +%}
+    </host>
+    {%- endfor +%}
+  </dns>
+  {%- endif +%}
+  {%- for ip_item in ip +%}
+  <ip{% for k, v in ip_item|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- if ip_item.dhcp is defined +%}
+    <dhcp>
+      {%- if ip_item.dhcp.range is defined +%}
+      <range{% for k, v in ip_item.dhcp.range|items if k != 'lease' %} {{ k }}='{{ v }}'{% endfor %}>
+        {%- if ip_item.dhcp.range.lease is defined +%}
+        <lease expire='{{ ip_item.dhcp.range.lease }}' unit='minutes'/>
+        {%- endif +%}
+      </range>
+      {%- endif +%}
+      {%- if ip_item.dhcp.host is defined +%}
+      {%- for host in ip_item.dhcp.host +%}
+      <host{% for k, v in host|items if k != 'lease' %} {{ k }}='{{ v }}'{% endfor %}>
+        {%- if host.lease is defined +%}
+        <lease expire='{{ host.lease }}' unit='minutes'>
+        {%- endif +%}
+      </host>
+      {%- endfor +%}
+      {%- endif +%}
+      {%- if ip_item.dhcp.bootp is defined +%}
+      <bootp{% for k, v in ip_item.dhcp.bootp|items %} {{ k }}='{{ v }}'{% endfor %}/>
+      {%- endif +%}
+    </dhcp>
+    {%- endif +%}
+  </ip>
+  {%- endfor +%}
+
+  <!-- Static Routes -->
+  {%- if route is defined +%}
+  {%- for route_item in route +%}
+  <route{% for k, v in route_item|items %} {{ k }}='{{ v }}'{% endfor %}/>
+  {%- endfor +%}
+  {%- endif +%}
+</network>

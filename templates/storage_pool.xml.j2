@@ -1,0 +1,65 @@
+<!--
+  https://libvirt.org/formatstorage.html#storage-pool-xml
+-->
+<pool type='{{ type }}'>
+  <!-- General -->
+  <name>{{ name }}</name>
+
+  {%- if features is defined +%}
+  <!-- Features -->
+  <features>
+    {%- for feature_key, feature_value in features|items +%}
+    <{{ feature_key }}{% for k, v in feature_value|items %} {{ k }}='{{ v }}'{% endfor %}'/>
+    {%- endfor +%}
+  </features>
+  {%- endif +%}
+
+  {%- if source is defined +%}
+  <!-- Source -->
+  <source>
+{%- for source_item_key, source_item_value in source|items +%}
+  {#- Define global namespace which will contain number of sub-item levels +#}
+  {%- set ns = namespace(levels=0) +%}
+
+  {#- Check if source contains sub-elements (level 1) +#}
+  {%- for k, v in source_item_value|items if v is mapping +%}{%- set ns.levels=1 +%}{%- endfor +%}
+  {#- Print level 0 +#}
+  {%- if ns.levels > 0 +%}
+    <{{ source_item_key }}{% for k, v in source_item_value|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- for source_item_sub1_key, source_item_sub1_value in source_item_value|items if source_item_sub1_value is mapping +%}
+
+      {#- Check if sub-elements also contain sub-elements (level 2) +#}
+      {%- for k, v in source_item_sub1_value|items if v is mapping +%}{%- set ns.levels=2 +%}{%- endfor +%}
+      {#- Print level 1 +#}
+      {%- if ns.levels > 1 +%}
+      <{{ source_item_sub1_key }}{% for k, v in source_item_sub1_value|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+        {%- for source_item_sub2_key, source_item_sub2_value in source_item_sub1_value|items if source_item_sub2_value is mapping +%}
+
+        {#- Print level 2 +#}
+        <{{ source_item_sub2_key }}{% for k, v in source_item_sub2_value|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}/>
+        {%- endfor +%}
+      </{{ source_item_sub1_key }}>
+      {%- else +%}
+      <{{ source_item_sub1_key }}{% for k, v in source_item_sub1_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
+      {%- endif +%}
+    {%- endfor +%}
+    </{{ source_item_key }}>
+  {%- else +%}
+    <{{ source_item_key }}{% for k, v in source_item_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
+  {%- endif +%}
+{%- endfor +%}
+  </source>
+  {%- endif +%}
+
+  <!-- Target -->
+  <target>
+    <path>{{ target.path }}</path>
+    {%- if target.permissions is defined +%}
+    <permissions>
+      {%- for k, v in target.permissions|items +%}
+      <{{ k }}>{{ v }}</{{ k }}>
+      {%- endfor +%}
+    </permissions>
+    {%- endif +%}
+  </target>
+</pool>

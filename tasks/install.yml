@@ -1,0 +1,61 @@
+---
+###
+# Based on Redhat 9 documentation:
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/assembly_enabling-virtualization-in-rhel-9_configuring-and-managing-virtualization
+###
+- name: Install Virtualization packages
+  ansible.builtin.dnf:
+    name:
+      - qemu-kvm
+      - libvirt
+      - virt-install
+      - virt-viewer
+    state: present
+
+- name: Start Virtualization services
+  ansible.builtin.systemd_service:
+    state: started
+    enabled: true
+    name: '{{ item }}'
+  loop:
+    - virtqemud.socket
+    - virtnetworkd.socket
+    - virtnodedevd.socket
+    - virtnwfilterd.socket
+    - virtsecretd.socket
+    - virtstoraged.socket
+    - virtinterfaced.socket
+    - virtqemud-ro.socket
+    - virtnetworkd-ro.socket
+    - virtnodedevd-ro.socket
+    - virtnwfilterd-ro.socket
+    - virtsecretd-ro.socket
+    - virtstoraged-ro.socket
+    - virtinterfaced-ro.socket
+    - virtqemud-admin.socket
+    - virtnetworkd-admin.socket
+    - virtnodedevd-admin.socket
+    - virtnwfilterd-admin.socket
+    - virtsecretd-admin.socket
+    - virtstoraged-admin.socket
+    - virtinterfaced-admin.socket
+
+- name: Enable IOMMU
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="((?:(?!intel_iommu=on).)*?)"$'
+    line: 'GRUB_CMDLINE_LINUX="\1 intel_iommu=on iommu=pt"'
+    backrefs: true
+    state: present
+  notify: update grub
+
+- name: Validate if system is ready for virtualization
+  ansible.builtin.command: /usr/bin/virt-host-validate
+  register: __registered_virt_host_validate
+  changed_when: false
+
+- name: Print host virtualization validation output
+  ansible.builtin.debug:
+    msg: '{{ __registered_virt_host_validate.stdout_lines }}'
+  failed_when: __registered_virt_host_validate.rc != 0
+...

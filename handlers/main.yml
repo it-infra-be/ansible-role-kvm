@@ -1,0 +1,7 @@
+---
+# Info: https://access.redhat.com/solutions/6668601
+- name: Update GRUB Bootloader
+  ansible.builtin.command: grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline
+  changed_when: true
+  listen: update grub
+...

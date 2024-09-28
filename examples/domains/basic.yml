@@ -1,0 +1,65 @@
+---
+#####
+# Basic virtual machine examples
+#####
+kvm_domains:
+  # Virtual Machine with install ISO
+  # Will boot from disk once installed
+  # Outgoing traffic will be NATed
+  - name: vm1
+    title: Virtual Machine 1
+    description: Virtual Machine 1
+    memory: 2GiB
+    vcpu: 2
+    disks:
+      - type: file
+        device: cdrom
+        boot:
+          order: 2
+        source:
+          file: /isos/AlmaLinux-9.4-x86_64-minimal.iso
+        target:
+          dev: sdx
+          bus: sata
+      - type: volume
+        device: disk
+        boot:
+          order: 1
+        source:
+          pool: vm1
+          volume: volume1.qcow2
+        target:
+          dev: vda
+          bus: virtio
+    interfaces:
+      - type: network
+        source:
+          network: nat
+        model:
+          type: virtio
+
+  # Virtual Machine which contains disk that already contains a bootable installation
+  # Outgoing traffic will be routed, local gateway has to route this network!
+  - name: vm1
+    title: Virtual Machine 1
+    description: Virtual Machine 1
+    memory: 2GiB
+    vcpu: 2
+    disks:
+      - type: volume
+        device: disk
+        boot:
+          order: 1
+        source:
+          pool: vm1
+          volume: volume1.qcow2
+        target:
+          dev: vda
+          bus: virtio
+    interfaces:
+      - type: network
+        source:
+          network: route
+        model:
+          type: virtio
+...

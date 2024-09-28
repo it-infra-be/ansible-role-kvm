@@ -1,0 +1,26 @@
+---
+- name: Define networks
+  community.libvirt.virt_net:
+    command: define
+    name: '{{ item.name }}'
+    xml: '{{ lookup("ansible.builtin.template", "network.xml.j2", template_vars=item) }}'
+  loop: '{{ kvm_networks | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Activate networks
+  community.libvirt.virt_net:
+    state: active
+    name: '{{ item.name }}'
+  loop: '{{ kvm_networks | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Start networks at boot time
+  community.libvirt.virt_net:
+    autostart: true
+    name: '{{ item.name }}'
+  loop: '{{ kvm_networks | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+...

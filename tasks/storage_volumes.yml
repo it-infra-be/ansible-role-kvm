@@ -1,0 +1,62 @@
+---
+- name: Gather facts about storage pools
+  community.libvirt.virt_pool:
+    command: facts
+
+- name: Create temporary files
+  ansible.builtin.tempfile:
+    state: file
+    suffix: libvirt_volume_{{ item.name }}
+  loop: '{{ kvm_storage_volumes | flatten(1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when: item.name not in ansible_libvirt_pools['vm1']['volumes']
+  register: __registered_libvirt_volume_files
+
+# Used copy instead of template in order to pass the loop dictionary (item)
+- name: Create volume XML file
+  ansible.builtin.copy:
+    content: '{{ lookup("ansible.builtin.template", "storage_volume.xml.j2", template_vars=item.item) }}'
+    dest: '{{ item.path }}'
+    mode: '0644'
+  loop: '{{ __registered_libvirt_volume_files.results | flatten(1) }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+  when: item.changed # noqa: no-handler
+
+- name: Create volume
+  ansible.builtin.command:
+    argv: "{{ item.item.from is defined |
+              ternary(['virsh', 'vol-create-from', item.item.pool, item.path, item.item.from],
+                      ['virsh', 'vol-create', item.item.pool, item.path])
+           }}"
+  loop: '{{ __registered_libvirt_volume_files.results | flatten(1) }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+  changed_when: true
+  when: item.changed # noqa: no-handler
+
+- name: Remove temporary file
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: absent
+  loop: '{{ __registered_libvirt_volume_files.results | flatten(1) }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+  when: item.changed # noqa: no-handler
+
+- name: Resize volumes
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - vol-resize
+      - '{{ item.name }}'
+      - '{{ item.capacity }}'
+      - --pool
+      - '{{ item.pool }}'
+  loop: '{{ kvm_storage_volumes | flatten(1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+  changed_when: true
+  when: item.resize is defined and item.resize
+...

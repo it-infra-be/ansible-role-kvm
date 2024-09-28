@@ -1,0 +1,48 @@
+---
+#####
+# Storage pools type examples
+#####
+kvm_storage_pools:
+  # Directory/File based storage pool
+  # Host managed iSCSI and NFS connections can also be used with this type
+  # https://libvirt.org/storage.html#directory-pool
+  - name: virtimages
+    type: dir
+    target:
+      path: /var/lib/virt/images
+
+  # iSCSI based storage pool
+  # Libvirt will manage the iSCSI connection
+  # https://libvirt.org/storage.html#iscsi-pool
+  - name: virtimages
+    type: iscsi
+    source:
+      host:
+        name: iscsi.example.com
+      device:
+        path: iqn.2013-06.com.example:iscsi-pool
+      auth:
+        type: chap
+        username: myuser
+        secret:
+          usage: libvirtiscsi
+    target:
+      path: /dev/disk/by-path
+
+  # NFS based storage pool
+  # Libvirt will manage the NFS connection
+  # https://libvirt.org/storage.html#network-filesystem-pool
+  - name: virtimages
+    type: netfs
+    source:
+      host:
+        name: nfs.example.com
+      dir:
+        path: /var/lib/libvirt/images
+      format:
+        type: nfs
+      protocol:
+        ver: 3
+    target:
+      path: /var/lib/virt/images
+...

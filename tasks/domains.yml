@@ -1,0 +1,27 @@
+---
+- name: Define domains
+  community.libvirt.virt:
+    command: define
+    name: '{{ item.name }}'
+    xml: '{{ lookup("ansible.builtin.template", "domain.xml.j2", template_vars=item) }}'
+    mutate_flags: ['ADD_UUID', 'ADD_MAC_ADDRESSES']
+  loop: '{{ kvm_domains | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Start domains
+  community.libvirt.virt:
+    state: running
+    name: '{{ item.name }}'
+  loop: '{{ kvm_domains | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Start domains at boot time
+  community.libvirt.virt:
+    autostart: true
+    name: '{{ item.name }}'
+  loop: '{{ kvm_domains | flatten(levels=1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+...
