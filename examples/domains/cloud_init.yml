@@ -1,0 +1,34 @@
+---
+#####
+# Cloud-Init virtual machine examples
+#####
+kvm_domains:
+  - name: vm1
+    title: Virtual Machine 1
+    description: Virtual Machine 1
+    memory: 2GiB
+    vcpu: 2
+    sysinfo:
+      - type: smbios
+        system:
+          serial: ds=nocloud-net;s=http://169.254.169.254/default/
+    disks:
+      - type: volume
+        device: disk
+        boot:
+          order: 1
+        source:
+          pool: vm1
+          volume: volume1.qcow2
+        target:
+          dev: vda
+          bus: virtio
+    interfaces:
+      # Reminder: When cloud-init is installed on the hypervisor it will not work on a routed network interface.
+      #           Because this type of network does not allow traffic from a guest towards the host.
+      - type: network
+        source:
+          network: nat
+        model:
+          type: virtio
+...

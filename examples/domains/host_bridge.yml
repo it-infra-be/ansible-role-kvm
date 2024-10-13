@@ -1,0 +1,58 @@
+---
+#####
+# Host bridge connected virtual machine examples
+#####
+kvm_domains:
+  # Virtual machine connected to network which points to a host defined bridge (configured outside libvirt).
+  # When the VM boots the interface will be changed dynamically to a 'bridge' type interface.
+  # This will cause Cockpit to show the warning: 'Pending changes, restart VM', which will not be solved after a restart.
+  # Apart from this, this configuration works fine.
+  # Bug: https://github.com/cockpit-project/cockpit-machines/issues/563
+  - name: vm1
+    title: Virtual Machine 1
+    description: Virtual Machine 1
+    memory: 2GiB
+    vcpu: 2
+    disks:
+      - type: volume
+        device: disk
+        boot:
+          order: 1
+        source:
+          pool: vm1
+          volume: volume1.qcow2
+        target:
+          dev: vda
+          bus: virtio
+    interfaces:
+      - type: network
+        source:
+          network: bridge
+        model:
+          type: virtio
+
+  # Virtual machine connected directly to a host defined bridge (configured outside libvirt).
+  # More info: https://libvirt.org/formatdomain.html#bridge-to-lan
+  - name: vm2
+    title: Virtual Machine 2
+    description: Virtual Machine 2
+    memory: 2GiB
+    vcpu: 2
+    disks:
+      - type: volume
+        device: disk
+        boot:
+          order: 1
+        source:
+          pool: vm1
+          volume: volume1.qcow2
+        target:
+          dev: vda
+          bus: virtio
+    interfaces:
+      - type: bridge
+        source:
+          bridge: bridge0
+        model:
+          type: virtio
+...

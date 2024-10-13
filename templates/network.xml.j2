@@ -66,6 +66,8 @@
     {%- endfor +%}
   </dns>
   {%- endif +%}
+
+  {%- if ip is defined +%}
   {%- for ip_item in ip +%}
   <ip{% for k, v in ip_item|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
     {%- if ip_item.dhcp is defined +%}
@@ -93,6 +95,7 @@
     {%- endif +%}
   </ip>
   {%- endfor +%}
+  {%- endif +%}
 
   <!-- Static Routes -->
   {%- if route is defined +%}

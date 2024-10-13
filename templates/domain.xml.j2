@@ -52,8 +52,29 @@
 
   <os>
     <type arch='x86_64' machine='q35'>hvm</type>
+  {%- if sysinfo is defined +%}
+  {%- for sysinfo_item in sysinfo +%}
+    {%- if sysinfo_item.type is defined and sysinfo_item.type == 'smbios' +%}
+    <smbios mode='sysinfo'/>
+    {%- endif +%}
+  {%- endfor +%}
+  {%- endif +%}
     <!-- Configure the boot order at device level! -->
   </os>
+
+  {%- if sysinfo is defined +%}
+  {%- for sysinfo_item in sysinfo +%}
+  <sysinfo{% for k, v in sysinfo_item|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- for sub1_key, sub1_value in sysinfo_item|items if sub1_value is mapping +%}
+    <{{ sub1_key }}>
+      {%- for entry_name, entry_value in sub1_value|items +%}
+          <entry name='{{ entry_name }}'>{{ entry_value }}</entry>
+      {%- endfor +%}
+    </{{ sub1_key }}>
+    {%- endfor +%}
+  </sysinfo>
+  {%- endfor +%}
+  {%- endif +%}
 
   <features>
     <acpi/>
