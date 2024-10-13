@@ -1,4 +1,5 @@
 # Networks
+
 The 'kvm_networks' variable contains a list of networks to create and/or modify.
 
 The network configuration is based on the [Libvirt XML configuration](https://libvirt.org/formatnetwork.html).
@@ -17,7 +18,7 @@ kvm_networks:
     port: dict()    # Configure isolated ports (isolate traffic between guests) (OPTIONAL)
     bridge: dict()  # Configuration of bridge device for network (OPTIONAL)
     forward: dict() # Configuration of physical LAN connection (OPTIONAL)
-    ip: list()      # IPv4 and/or IPv6 networks to define on network
+    ip: list()      # IPv4 and/or IPv6 networks to define on network (OPTIONAL)
     route: list()   # Static route configuration (OPTIONAL)
     bandwidth: dict() # Configure Quality Of Service (OPTIONAL)
     domain: dict()  # Defines the DHCP DNS domain (OPTIONAL)

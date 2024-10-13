@@ -1,6 +1,6 @@
 ---
 #####
-# Different physical LAN connection possibility examples
+# Network type examples
 #####
 kvm_networks:
   # Isolated network, not connected to a physical LAN
@@ -33,6 +33,7 @@ kvm_networks:
       name: example.com
 
   # Routed network
+  # Only DNS and DHCP traffic is allowed to the host, even when other services are defined in libvirt-routed zone!
   - name: route
     title: Routed network
     description: Routed network
@@ -57,6 +58,37 @@ kvm_networks:
           range:
             start: 2001:db8:ca2:4::10
             end: 2001:db8:ca2:4::ff
+            lease: 60 # Minutes
+
+    domain:
+      name: example.com
+
+  # Open network
+  # Routed network with no predefined firewall rules
+  - name: open
+    title: Open network
+    description: Open network
+    ipv6: 'yes'
+
+    forward:
+      mode: open
+
+    ip:
+      - family: ipv4
+        address: 192.168.125.1
+        netmask: 255.255.255.0
+        dhcp:
+          range:
+            start: 192.168.125.100
+            end: 192.168.125.200
+            lease: 60 # Minutes
+      - family: ipv6
+        address: 2001:db8:ca2:5::1
+        prefix: 64
+        dhcp:
+          range:
+            start: 2001:db8:ca2:5::10
+            end: 2001:db8:ca2:5::ff
             lease: 60 # Minutes
 
     domain:
@@ -94,4 +126,17 @@ kvm_networks:
 
     domain:
       name: example.com
+
+  # Host bridge network for bridge which was configured outside libvirt
+  # This network is optional, a domain can also be directly connected to a bridge
+  - name: bridge
+    title: Bridge network
+    description: Host bridge network
+    ipv6: 'yes'
+
+    forward:
+      mode: bridge
+
+    bridge:
+      name: br0
 ...

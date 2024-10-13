@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0] - 2024-10-14
+
+### New Features
+
+- Domains: Added SMBIOS System Information option (needed for cloud-init)
+- Domains: Added cloud-init and host bridge examples
+- Networks: Added host bridge and open type examples
+
+### Other Changes
+
+- Networks: Made ip variable optional 
+
 ## [1.0.0] - 2024-09-28
 
 ### New Features

@@ -24,6 +24,7 @@ kvm_domains:
     disks: list()       # Describe disks (OPTIONAL)
     filesystems: list() # Host directories and/or templates which can be accesses directly in the virtual machine (OPTIONAL) 
     interfaces: list()  # Network interfaces to attach to the virtual machine (OPTIONAL)
+    sysinfo: dict()     # Info to present to the guest via SMBIOS, can be used for cloud-init (OPTIONAL)
 ```
 
 **Note:** The keys 'vcpu_options', 'memory_options' and 'mamMemory_options' are not directly available
@@ -161,4 +162,17 @@ kvm_domains:
           network: default
         model:
           type: virtio
+```
+
+### System Information
+
+```yaml
+kvm_domains:
+  - name: vm1
+    memory: 2GiB
+    vcpu: 2
+    sysinfo:
+      - type: smbios
+        system:
+          serial: ds=nocloud-net;s=http://169.254.169.254/default/
 ```
