@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2024-10-29
+
+### New Features
+
+- Domains: Added OS firmware options to enable EFI and secure boot configuration
+- Domains: Added UEFI firmware examples
+
 ## [1.1.0] - 2024-10-14
 
 ### New Features

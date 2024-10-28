@@ -40,9 +40,9 @@ kvm_domains:
 
   # Virtual Machine which contains disk that already contains a bootable installation
   # Outgoing traffic will be routed, local gateway has to route this network!
-  - name: vm1
-    title: Virtual Machine 1
-    description: Virtual Machine 1
+  - name: vm2
+    title: Virtual Machine 2
+    description: Virtual Machine 2
     memory: 2GiB
     vcpu: 2
     disks:
@@ -52,7 +52,38 @@ kvm_domains:
           order: 1
         source:
           pool: vm1
-          volume: volume1.qcow2
+          volume: volume2.qcow2
+        target:
+          dev: vda
+          bus: virtio
+    interfaces:
+      - type: network
+        source:
+          network: route
+        model:
+          type: virtio
+
+  # Virtual machine that will use UEFI architecture with secure boot enabled
+  - name: vm3
+    title: Virtual Machine 3
+    description: Virtual Machine 3
+    memory: 2GiB
+    vcpu: 2
+    os:
+      firmware: efi
+      firmware_features:
+        - name: enrolled-keys
+          enabled: 'yes'
+        - name: secure-boot
+          enabled: 'yes'
+    disks:
+      - type: volume
+        device: disk
+        boot:
+          order: 1
+        source:
+          pool: vm1
+          volume: volume3.qcow2
         target:
           dev: vda
           bus: virtio

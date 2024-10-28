@@ -50,8 +50,15 @@
   </vcpus>
   {%- endif %}
 
-  <os>
+  <os{% for k, v in os|items if k == 'firmware' %} {{ k }}='{{ v }}'{% endfor %}>
     <type arch='x86_64' machine='q35'>hvm</type>
+  {%- if os.firmware_features is defined +%}
+    <firmware>
+    {%- for firmware_feature in os.firmware_features +%}
+      <feature {% for k, v in firmware_feature|items %} {{ k }}='{{ v }}'{% endfor %}/>
+    {%- endfor +%}
+    </firmware>
+  {%- endif +%}
   {%- if sysinfo is defined +%}
   {%- for sysinfo_item in sysinfo +%}
     {%- if sysinfo_item.type is defined and sysinfo_item.type == 'smbios' +%}

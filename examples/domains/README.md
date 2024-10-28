@@ -24,6 +24,7 @@ kvm_domains:
     disks: list()       # Describe disks (OPTIONAL)
     filesystems: list() # Host directories and/or templates which can be accesses directly in the virtual machine (OPTIONAL) 
     interfaces: list()  # Network interfaces to attach to the virtual machine (OPTIONAL)
+    os: dict()          # Virtual machine firmware options (OPTIONAL)
     sysinfo: dict()     # Info to present to the guest via SMBIOS, can be used for cloud-init (OPTIONAL)
 ```
 
@@ -164,6 +165,27 @@ kvm_domains:
           type: virtio
 ```
 
+### Operating System Booting
+
+For the OS booting options only the options shown here are supported by this role. 
+
+```yaml
+kvm_domains:
+  - name: vm1
+    memory: 2GiB
+    vcpu: 2
+    os:
+      firmware: efi # BIOS is default when not specified
+      # Enable secure boot
+      firmware_features:
+        - name: enrolled-keys
+          enabled: 'yes'
+        - name: secure-boot
+          enabled: 'yes'
+```
+
+Libvirt EFI Secure Boot information: https://libvirt.org/kbase/secureboot.html
+
 ### System Information
 
 ```yaml
@@ -176,3 +198,5 @@ kvm_domains:
         system:
           serial: ds=nocloud-net;s=http://169.254.169.254/default/
 ```
+
+***Note:*** When 'smbios'-type is used this is automatically enabled in the XML OS booting element too.
