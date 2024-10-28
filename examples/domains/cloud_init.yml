@@ -8,6 +8,8 @@ kvm_domains:
     description: Virtual Machine 1
     memory: 2GiB
     vcpu: 2
+    os:
+      firmware: efi # Cloud-init (sysinfo) works with both BIOS and EFI
     sysinfo:
       - type: smbios
         system:
