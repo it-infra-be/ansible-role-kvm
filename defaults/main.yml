@@ -4,4 +4,5 @@ kvm_networks: []
 kvm_storage_pools: []
 kvm_storage_volumes: []
 kvm_domains: []
+kvm_vms: []
 ...

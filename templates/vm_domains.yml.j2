@@ -1,0 +1,58 @@
+---
+{% set alphabet = 'abcdefghijklmnopqrstuvwxyz' %}
+{%- for vm in kvm_vms +%}
+- name: '{{ vm.name }}'
+  title: '{{ vm.name }}'
+  description: "Virtual Machine '{{ vm.name }}'"
+
+  memory: {{ vm.memory }}
+  vcpu: {{ vm.vcpu }}
+  {%- if vm.efi is not defined or (vm.efi is defined and vm.efi) +%}
+  os:
+    firmware: efi
+    firmware_features:
+      - name: enrolled-keys
+        enabled: 'yes'
+      - name: secure-boot
+        enabled: 'yes'
+  {%- endif +%}
+  {%- if kvm_cloud_init_server is defined and (vm.cloud_init is not defined or (vm.cloud_init is defined and vm.cloud_init)) +%}
+  sysinfo:
+    - type: smbios
+      system:
+        serial: ds=nocloud-net;s={{ kvm_cloud_init_server }}
+  {%- endif +%}
+  disks:
+  {%- for disk in vm.disks +%}
+    - type: volume
+      device: disk
+      {%- if loop.index0==0 +%}
+      boot:
+        order: 1
+      {%- endif +%}
+      driver:
+        name: qemu
+        type: qcow2
+      source:
+        pool: {{ disk.pool }}
+        volume: {{ disk.name if disk.name is defined else ('%s-root.qcow2' % vm.name if loop.index0==0 else '%s-data%s.qcow2' % (vm.name, loop.index0)) }}
+      target:
+        dev: vd{{ alphabet[loop.index0] }}
+        bus: virtio
+  {%- endfor +%}
+  interfaces:
+  {%- for interface in vm.interfaces +%}
+    {%- if interface.bridge is defined +%}
+    - type: bridge
+      source:
+        bridge: '{{ interface.bridge }}'
+    {%- elif interface.network is defined +%}
+    - type: network
+      source:
+        network: '{{ interface.network }}'
+    {%- endif +%}
+      model:
+        type: virtio
+  {%- endfor +%}
+{%- endfor +%}
+...

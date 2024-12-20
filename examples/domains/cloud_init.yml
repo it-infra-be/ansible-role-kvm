@@ -1,6 +1,6 @@
 ---
 #####
-# Cloud-Init virtual machine examples
+# Cloud-Init domain examples
 #####
 kvm_domains:
   - name: vm1

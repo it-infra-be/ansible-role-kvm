@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2024-12-20
+
+### New Features
+
+- Virtual Machines: Added simplified way to create domains and storage volumes via virtual machines
+
 ## [1.2.0] - 2024-10-29
 
 ### New Features

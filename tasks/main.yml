@@ -14,13 +14,22 @@
     file: storage_pools.yml
   tags: storage_pools
 
+- name: Import virtual machines tasks
+  ansible.builtin.import_tasks:
+    file: vms.yml
+  tags: vms
+
 - name: Import storage volume tasks
   ansible.builtin.import_tasks:
     file: storage_volumes.yml
-  tags: storage_volumes
+  tags:
+    - storage_volumes
+    - vms
 
 - name: Import domain tasks
   ansible.builtin.import_tasks:
     file: domains.yml
-  tags: domains
+  tags:
+    - domains
+    - vms
 ...

@@ -1,6 +1,6 @@
 ---
 #####
-# Basic virtual machine examples
+# Basic domain examples
 #####
 kvm_domains:
   # Virtual Machine with install ISO

@@ -1,0 +1,36 @@
+---
+#####
+# Basic virtual machine examples
+#####
+# Cloud Init server
+# When using Cloud Init, make sure this is correct or the initial boot of VMs can fail
+kvm_cloud_init_server: http://169.254.169.254/default/
+
+kvm_vms:
+  # Virtual machine with new root volume based on Almalinux image and new empty data volume.
+  # UEFI and Cloud Init are enabled by default.
+  - name: vm01
+    vcpu: 1
+    memory: 2GiB
+    disks:
+      - pool: vm1
+        size: 10GiB
+        image: /vm1/AlmaLinux-9-GenericCloud-9.3-20231113.x86_64.qcow2
+      - pool: vm1
+        size: 20GiB
+    interfaces:
+      - bridge: bridge0
+
+  # Virtual machine with already existing root volume.
+  # The virtual machine will use BIOS firmware and will not use Cloud Init.
+  - name: vm02
+    vcpu: 2
+    memory: 4GiB
+    efi: false
+    cloud_init: false
+    disks:
+      - pool: vm1
+        name: vm02-existing.qcow2
+    interfaces:
+      - bridge: bridge0
+...
