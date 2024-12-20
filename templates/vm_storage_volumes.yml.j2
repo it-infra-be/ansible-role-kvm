@@ -1,0 +1,18 @@
+---
+{%- for vm in kvm_vms +%}
+  {%- for disk in vm.disks +%}
+    {%- if disk.name is not defined +%}
+- name: {{ '%s-root.qcow2' % vm.name if loop.index0==0 else '%s-data%s.qcow2' % (vm.name, loop.index0) }}
+  pool: {{ disk.pool }}
+  capacity: {{ disk.size }}
+  {%- if disk.image is defined +%}
+  from: {{ disk.image }}
+  {%- endif +%}
+  target:
+    format:
+      type: 'qcow2'
+      compat: '1.1'
+    {%- endif +%}
+  {%- endfor +%}
+{%- endfor +%}
+...

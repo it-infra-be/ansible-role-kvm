@@ -1,6 +1,6 @@
 ---
 #####
-# Host bridge connected virtual machine examples
+# Host bridge connected domain examples
 #####
 kvm_domains:
   # Virtual machine connected to network which points to a host defined bridge (configured outside libvirt).
