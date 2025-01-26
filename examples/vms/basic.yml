@@ -33,4 +33,5 @@ kvm_vms:
         name: vm02-existing.qcow2
     interfaces:
       - bridge: bridge0
+        vlan: 102 # VLANs for linux bridges (VLAN filtering) are supported since Libvirt 11.0
 ...

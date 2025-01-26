@@ -46,6 +46,11 @@
     - type: bridge
       source:
         bridge: '{{ interface.bridge }}'
+      {%- if interface.vlan is defined +%}
+      vlan:
+        tag:
+          id: '{{ interface.vlan }}'
+      {%- endif +%}
     {%- elif interface.network is defined +%}
     - type: network
       source:
