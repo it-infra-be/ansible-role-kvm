@@ -59,6 +59,7 @@ All disks are virtio devices which will be called '/dev/vd[a-z]'.
 ```yaml
 interfaces:
   - bridge: string   # Name of bridge to use for the virtual machine
+    vlan: int        # Optional VLAN ID (supported since Libvirt 11.0, see Linux Bridge VLAN filtering)
   - network: string  # Or name of network to use for the virtual machine
 ```
 

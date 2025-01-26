@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0] - 2025-01-26
+
+### New Features
+
+- Virtual Machines: Added interface VLAN support, supported since Libvirt 11.0 for regular linux bridges (VLAN filtering)
+
 ## [1.3.0] - 2024-12-20
 
 ### New Features
