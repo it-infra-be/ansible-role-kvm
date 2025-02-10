@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.1] - 2025-02-10
+
+### Bug Fixes
+
+- Domains: replace '.' in domain name with '_' for interface aliases
+
 ## [1.4.0] - 2025-01-26
 
 ### New Features
