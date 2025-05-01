@@ -120,7 +120,7 @@
   {%- if interfaces is defined +%}
     {%- for interface in interfaces -%}
     {{ dict_to_xml('interface', interface, ['alias']) | indent(4) }}
-        <alias name='ua-{{ name }}-nic{{ loop.index }}'/>
+        <alias name='ua-{{ name | replace(".", "_") }}-nic{{ loop.index }}'/>
     </interface>
     {%- endfor +%}
   {%- endif +%}
