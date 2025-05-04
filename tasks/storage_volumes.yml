@@ -1,4 +1,7 @@
 ---
+###
+# Create new volumes
+###
 - name: Gather facts about storage pools
   community.libvirt.virt_pool:
     command: facts
@@ -10,7 +13,7 @@
   loop: '{{ kvm_storage_volumes | flatten(1) }}'
   loop_control:
     label: '{{ item.name }}'
-  when: item.name not in ansible_libvirt_pools['vm1']['volumes']
+  when: item.name not in ansible_libvirt_pools[item.pool]['volumes']
   register: __registered_libvirt_volume_files
 
 # Used copy instead of template in order to pass the loop dictionary (item)
@@ -36,6 +39,21 @@
   changed_when: true
   when: item.changed # noqa: no-handler
 
+- name: Set volume capacity for image based volumes
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - vol-resize
+      - '{{ item.item.name }}'
+      - '{{ item.item.capacity }}'
+      - --pool
+      - '{{ item.item.pool }}'
+  loop: '{{ __registered_libvirt_volume_files.results | flatten(1) }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+  changed_when: true
+  when: item.changed and item.item.from is defined and item.item.capacity is defined
+
 - name: Remove temporary file
   ansible.builtin.file:
     path: '{{ item.path }}'
@@ -45,6 +63,9 @@
     label: '{{ item.item.name }}'
   when: item.changed # noqa: no-handler
 
+###
+# Change existing volumes
+###
 - name: Resize volumes
   ansible.builtin.command:
     argv:

@@ -1,6 +1,6 @@
 ---
 - name: Render VMs configuration
-  set_fact:
+  ansible.builtin.set_fact:
     kvm_storage_volumes: "{{ kvm_storage_volumes + (lookup('ansible.builtin.template', 'vm_storage_volumes.yml.j2') | from_yaml) }}"
     kvm_domains: "{{ kvm_domains + (lookup('ansible.builtin.template', 'vm_domains.yml.j2') | from_yaml) }}"
 ...

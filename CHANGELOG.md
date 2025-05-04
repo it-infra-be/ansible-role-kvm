@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.2] - 2025-05-03
+
+### Bug Fixes
+
+- Storage Volumes: Changed static pool name to variable
+- Storage Volumes: Resize new image based volumes to match configured capacity
+- Ansible Lint fixes
+
 ## [1.4.1] - 2025-02-10
 
 ### Bug Fixes
