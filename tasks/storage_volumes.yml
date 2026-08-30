@@ -86,7 +86,34 @@
     - item.capacity is defined
     - item.name in ansible_libvirt_pools[item.pool]['volumes']
   changed_when: false
+  check_mode: false  # read-only, so run it during a dry run too
   register: __registered_libvirt_volume_info
+
+# In a dry run (--check) the virsh calls below are skipped, so show what they
+# would have done instead.
+- name: List storage volumes that would be created
+  ansible.builtin.debug:
+    msg: 'create: {{ item.name }} (pool {{ item.pool }})'
+  loop: '{{ kvm_storage_volumes | flatten(1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - ansible_check_mode
+    - item.name not in ansible_libvirt_pools[item.pool]['volumes']
+
+- name: List storage volumes that would be grown
+  ansible.builtin.debug:
+    msg: 'grow: {{ item.item.name }} ({{ __current_capacity | int | human_readable }} -> {{ __wanted_capacity | int | human_readable }})'
+  loop: '{{ __registered_libvirt_volume_info.results | flatten(1) }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+  vars:
+    __current_capacity: '{{ item.stdout_lines | default([]) | select("match", "^Capacity:") | first | regex_replace("[^0-9]", "") | int }}'
+    __wanted_capacity: '{{ item.item.capacity | regex_replace("i", "") | human_to_bytes }}'
+  when:
+    - ansible_check_mode
+    - not (item.skipped | default(false))
+    - __wanted_capacity | int > __current_capacity | int
 
 - name: Grow volumes to match configured capacity
   ansible.builtin.command:
