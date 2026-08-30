@@ -65,19 +65,48 @@
 
 ###
 # Change existing volumes
+#
+# Grow an existing volume when its configured 'capacity' is larger than the
+# volume's current capacity. Sizes are compared in bytes so the check is
+# idempotent; shrinking is not supported by libvirt and is left untouched.
 ###
-- name: Resize volumes
+- name: Get current capacity of existing volumes
+  ansible.builtin.command:
+    argv:
+      - virsh
+      - vol-info
+      - --bytes
+      - --pool
+      - '{{ item.pool }}'
+      - '{{ item.name }}'
+  loop: '{{ kvm_storage_volumes | flatten(1) }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - item.capacity is defined
+    - item.name in ansible_libvirt_pools[item.pool]['volumes']
+  changed_when: false
+  register: __registered_libvirt_volume_info
+
+- name: Grow volumes to match configured capacity
   ansible.builtin.command:
     argv:
       - virsh
       - vol-resize
-      - '{{ item.name }}'
-      - '{{ item.capacity }}'
+      - '{{ item.item.name }}'
+      - '{{ __wanted_capacity }}'
       - --pool
-      - '{{ item.pool }}'
-  loop: '{{ kvm_storage_volumes | flatten(1) }}'
+      - '{{ item.item.pool }}'
+  loop: '{{ __registered_libvirt_volume_info.results | flatten(1) }}'
   loop_control:
-    label: '{{ item.name }}'
+    label: '{{ item.item.name }}'
+  vars:
+    # 'GiB' -> 'GB' so human_to_bytes (which rejects the IEC form) can read it;
+    # both it and libvirt then treat the suffix as binary (2^30).
+    __current_capacity: '{{ item.stdout_lines | default([]) | select("match", "^Capacity:") | first | regex_replace("[^0-9]", "") | int }}'
+    __wanted_capacity: '{{ item.item.capacity | regex_replace("i", "") | human_to_bytes }}'
+  when:
+    - not (item.skipped | default(false))
+    - __wanted_capacity | int > __current_capacity | int
   changed_when: true
-  when: item.resize is defined and item.resize
 ...
