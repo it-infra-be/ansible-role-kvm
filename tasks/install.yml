@@ -53,9 +53,15 @@
   ansible.builtin.command: /usr/bin/virt-host-validate
   register: __registered_virt_host_validate
   changed_when: false
+  check_mode: false  # read-only, so run it during a dry run too
+  failed_when: false  # never fail here; the next task decides
 
-- name: Print host virtualization validation output
+- name: Show host virtualization validation output
   ansible.builtin.debug:
     msg: '{{ __registered_virt_host_validate.stdout_lines }}'
-  failed_when: __registered_virt_host_validate.rc != 0
+  # virt-host-validate also exits non-zero on WARN. Only stop on a real FAIL,
+  # or when the command itself could not run (return code 2 or higher).
+  failed_when: >-
+    __registered_virt_host_validate.rc not in [0, 1]
+    or 'FAIL' in __registered_virt_host_validate.stdout
 ...
