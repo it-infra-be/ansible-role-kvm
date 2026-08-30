@@ -40,7 +40,7 @@
   {%- if bandwidth is defined +%}
   <bandwidth>
     {%- for sub1_key, sub1_value in bandwidth|items +%}
-    <{{ sub1_key }}{% for k, v in sub1_value|items %} {{ k }}='{{ v }}'{% endfor %}>
+    <{{ sub1_key }}{% for k, v in sub1_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
     {%- endfor +%}
   </bandwidth>
   {%- endif +%}
