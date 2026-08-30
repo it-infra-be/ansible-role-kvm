@@ -13,7 +13,6 @@ kvm_storage_volumes:
   - name: string # Name of storage volume
     pool: string # Pool name to place storage volume in
     from: string # Pathname of image to copy content from (OPTIONAL)
-    resize: bool # Inform when a volume needs to be resized with a newly configured capacity (OPTIONAL) 
     allocation: string  # Total storage allocation for the volume, incl. unit (OPTIONAL)
     capacity: string    # Total storage capacity for the volume, incl. unit
     target: dict()  # Describes mapping of the storage volume in the hosts filesystem (OPTIONAL)
@@ -22,9 +21,6 @@ kvm_storage_volumes:
 
 **Note:**  The 'pool' and 'from' keys are not part of the Libvirt XML file.
 These keys are needed during storage volume creation.
-
-**Note:**  The 'resize' key is not part of the Libvirt XML file.
-This key is used to enforce a storage volume resize.
 
 The [storage_volumes.xml.j2](templates/storage_volumes.xml.j2) is used to convert each storage volume configuration to an XML file. 
 
@@ -75,12 +71,17 @@ kvm_storage_volumes:
 
 ### Resize
 
+To grow an existing volume, raise its `capacity` and run the role again:
+
 ```yaml
 kvm_storage_volumes:
   - name: volume1.raw
     pool: virtimages
-    resize: true  # Can be removed or disabled again when the storage volume is resized
     capacity: 1T
 ```
 
-**Note:** It is not possible to shrink a volume.
+On every run the role compares the configured `capacity` with the volume's real
+capacity (in bytes) and only calls `virsh vol-resize` when the volume is smaller.
+Runs where nothing changed report no change.
+
+**Note:** It is not possible to shrink a volume; a lower `capacity` is ignored.
