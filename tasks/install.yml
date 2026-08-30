@@ -40,14 +40,26 @@
     - virtstoraged-admin.socket
     - virtinterfaced-admin.socket
 
-- name: Enable IOMMU
+- name: Detect the CPU vendor for the IOMMU kernel argument
+  ansible.builtin.command: grep -m1 -oE 'GenuineIntel|AuthenticAMD' /proc/cpuinfo
+  register: __registered_cpu_vendor
+  changed_when: false
+  check_mode: false
+  failed_when: false
+  when: kvm_enable_iommu
+
+- name: Enable IOMMU on the kernel command line
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX="((?:(?!intel_iommu=on).)*?)"$'
-    line: 'GRUB_CMDLINE_LINUX="\1 intel_iommu=on iommu=pt"'
+    regexp: '^GRUB_CMDLINE_LINUX="((?:(?!{{ __kvm_iommu_arg }}).)*?)"$'
+    line: 'GRUB_CMDLINE_LINUX="\1 {{ __kvm_iommu_arg }} iommu=pt"'
     backrefs: true
     state: present
+  vars:
+    # 'iommu=pt' works for both; only the vendor flag differs.
+    __kvm_iommu_arg: "{{ 'amd_iommu=on' if 'AuthenticAMD' in __registered_cpu_vendor.stdout else 'intel_iommu=on' }}"
   notify: update grub
+  when: kvm_enable_iommu
 
 - name: Validate if system is ready for virtualization
   ansible.builtin.command: /usr/bin/virt-host-validate

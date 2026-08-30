@@ -26,6 +26,13 @@ argument_specs:
           - URL of a NoCloud cloud-init server, for example http://169.254.169.254/default/.
           - When set, each kvm_vms entry gets an SMBIOS serial that points to it, unless the VM has cloud_init set to false.
 
+      kvm_enable_iommu:
+        type: bool
+        default: true
+        description:
+          - Add the IOMMU options to the kernel command line. Needed for PCI passthrough. The change needs a reboot.
+          - The vendor flag (intel_iommu=on or amd_iommu=on) is picked from the host CPU.
+
       kvm_networks:
         type: list
         elements: dict
