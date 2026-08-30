@@ -1,0 +1,285 @@
+---
+# Ansible checks the variables below before it runs any task in this role.
+# If a value is missing or has the wrong type, the run stops right away and
+# says which variable is wrong.
+#
+# Only the keys that the tasks and templates use by name are checked. Many
+# libvirt objects let you add extra nested keys (for example a network "forward"
+# block, or a domain "disks" list). Those are only checked to be a dict or a
+# list of dicts, so any libvirt option you add still passes through.
+#
+# The check runs on the values you pass in, before tasks/vms.yml turns "kvm_vms"
+# into extra "kvm_storage_volumes" and "kvm_domains" entries.
+
+argument_specs:
+  main:
+    short_description: Install, configure and use KVM
+    description:
+      - Installs KVM and libvirt on Enterprise Linux 9.
+      - Can also define libvirt networks, storage pools, storage volumes and domains.
+      - Every list is empty by default. The role only touches what you give it.
+    options:
+
+      kvm_cloud_init_server:
+        type: str
+        description:
+          - URL of a NoCloud cloud-init server, for example http://169.254.169.254/default/.
+          - When set, each kvm_vms entry gets an SMBIOS serial that points to it, unless the VM has cloud_init set to false.
+
+      kvm_networks:
+        type: list
+        elements: dict
+        default: []
+        description: Libvirt networks. Each one is defined, started and set to autostart.
+        options:
+          name:
+            type: str
+            required: true
+            description: Network name.
+          title:
+            type: str
+            description: Short label.
+          description:
+            type: str
+            description: Longer description text.
+          ipv6:
+            type: str
+            choices: ["yes", "no"]
+            description: Sets the ipv6 attribute on the network. Put it in quotes in YAML so it stays "yes" or "no".
+          bridge:
+            type: dict
+            description: The <bridge> element, for example name and stp.
+          mtu:
+            type: int
+            description: The <mtu size> value.
+          domain:
+            type: dict
+            description: The <domain> element, for example name and localOnly.
+          forward:
+            type: dict
+            description: The <forward> element. Set mode, and add nested nat, interface or pf blocks if you need them.
+          port:
+            type: dict
+            description: The <port> element.
+          bandwidth:
+            type: dict
+            description: The <bandwidth> element, with inbound and/or outbound.
+          dns:
+            type: dict
+            description: The <dns> element. The lists forwarder, txt, srv and hosts are supported.
+          ip:
+            type: list
+            elements: dict
+            description: One item per <ip> element. Each item can have a dhcp block (range, host, bootp).
+          route:
+            type: list
+            elements: dict
+            description: One item per static <route> element.
+
+      kvm_storage_pools:
+        type: list
+        elements: dict
+        default: []
+        description: Libvirt storage pools. Each one is defined, started and set to autostart.
+        options:
+          name:
+            type: str
+            required: true
+            description: Pool name.
+          type:
+            type: str
+            required: true
+            description: Pool type, for example dir, fs, netfs or logical.
+          features:
+            type: dict
+            description: Child elements of <features>.
+          source:
+            type: dict
+            description: The <source> element.
+          target:
+            type: dict
+            required: true
+            description: The <target> element.
+            options:
+              path:
+                type: str
+                required: true
+                description: Directory on the host where the pool lives.
+              permissions:
+                type: dict
+                description: The <permissions> block (mode, owner, group, label).
+
+      kvm_storage_volumes:
+        type: list
+        elements: dict
+        default: []
+        description: Storage volumes to create. A volume is skipped if one with the same name already exists in the pool.
+        options:
+          name:
+            type: str
+            required: true
+            description: Volume name, usually ending in .qcow2.
+          pool:
+            type: str
+            required: true
+            description: Pool the volume belongs to.
+          from:
+            type: str
+            description: Path to a source image. When set, the volume is created from this image with virsh vol-create-from.
+          capacity:
+            type: str
+            description:
+              - Size as a number plus a unit, for example 20GiB. Use binary units (GiB, MiB) so it matches libvirt.
+              - On a later run, a volume smaller than this is grown to match. It cannot be made smaller.
+          allocation:
+            type: str
+            description: How much space to allocate up front, for example 0B.
+          target:
+            type: dict
+            description: The <target> element. Common keys are path, format, permissions, encryption, compat, nocow, clusterSize and features.
+          backingStore:
+            type: dict
+            description: The <backingStore> element (path, format, permissions).
+
+      kvm_domains:
+        type: list
+        elements: dict
+        default: []
+        description: Libvirt domains (virtual machines). Each one is defined, started and set to autostart.
+        options:
+          name:
+            type: str
+            required: true
+            description: Domain name.
+          title:
+            type: str
+            description: Short label.
+          description:
+            type: str
+            description: Longer description text.
+          memory:
+            type: raw
+            required: true
+            description: Memory as a number plus a unit, for example 2GiB.
+          memory_options:
+            type: dict
+            description: Extra attributes for the <memory> element.
+          currentMemory:
+            type: raw
+            description: The <currentMemory> value, as a number plus a unit.
+          maxMemory:
+            type: raw
+            description: The <maxMemory> value, as a number plus a unit.
+          maxMemory_options:
+            type: dict
+            description: Extra attributes for the <maxMemory> element, for example slots.
+          vcpu:
+            type: int
+            required: true
+            description: Number of virtual CPUs.
+          vcpu_options:
+            type: dict
+            description: Attributes for the <vcpu> element, for example placement and cpuset.
+          vcpus:
+            type: list
+            elements: dict
+            description: Per-CPU <vcpu> entries inside <vcpus>.
+          os:
+            type: dict
+            description:
+              - The <os> block. The firmware key becomes the firmware attribute on <os>.
+              - firmware_features is a list of name/enabled entries.
+          sysinfo:
+            type: list
+            elements: dict
+            description:
+              - sysinfo blocks. If an entry has type smbios, the role also adds a smbios sysinfo line under <os>.
+          disks:
+            type: list
+            elements: dict
+            description:
+              - One item per <disk>. You can use any libvirt disk keys.
+              - readonly and shareable are booleans, not attributes.
+          filesystems:
+            type: list
+            elements: dict
+            description:
+              - One item per <filesystem>. readonly is a boolean, not an attribute.
+          interfaces:
+            type: list
+            elements: dict
+            description:
+              - One item per <interface>. You can use any libvirt interface keys. An <alias> is added for you.
+
+      kvm_vms:
+        type: list
+        elements: dict
+        default: []
+        description:
+          - Short way to define VMs. Each entry becomes one kvm_domains entry.
+          - For every disk without a name, it also becomes one kvm_storage_volumes entry.
+          - After that the normal storage and domain tasks take over.
+        options:
+          name:
+            type: str
+            required: true
+            description: VM name. Also used as the prefix for created volume names.
+          memory:
+            type: raw
+            required: true
+            description: Memory as a number plus a unit, for example 2GiB.
+          vcpu:
+            type: int
+            required: true
+            description: Number of virtual CPUs.
+          efi:
+            type: bool
+            default: true
+            description: Use UEFI firmware with Secure Boot and enrolled keys.
+          cloud_init:
+            type: bool
+            default: true
+            description: Add a NoCloud SMBIOS serial that points to kvm_cloud_init_server. Does nothing if that variable is not set.
+          disks:
+            type: list
+            elements: dict
+            required: true
+            description: Disks in boot order. The first disk is the boot disk (vda).
+            options:
+              pool:
+                type: str
+                required: true
+                description: Pool for this disk's volume.
+              name:
+                type: str
+                description:
+                  - Name of an existing volume to use.
+                  - If you leave this out, a volume named <vm>-root.qcow2 or <vm>-dataN.qcow2 is created and size is required.
+              size:
+                type: str
+                description: Size of the new volume, for example 20GiB.
+              image:
+                type: str
+                description: Image to copy this volume from.
+          interfaces:
+            type: list
+            elements: dict
+            required: true
+            required_one_of:
+              - [bridge, network]
+            mutually_exclusive:
+              - [bridge, network]
+            required_by:
+              vlan: [bridge]
+            description: Network interfaces.
+            options:
+              bridge:
+                type: str
+                description: Name of a host bridge to attach to.
+              network:
+                type: str
+                description: Name of a libvirt network to attach to.
+              vlan:
+                type: int
+                description: VLAN tag. Only for bridge interfaces. Needs libvirt 11.0 or newer.
+...
