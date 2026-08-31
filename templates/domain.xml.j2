@@ -1,21 +1,17 @@
 <!--
   https://libvirt.org/formatdomain.html
 -->
-{%- macro dict_to_xml(name, dict, ignore_list=[]) +%}
-<{{ name }}{% for k, v in dict|items if v is not mapping and k not in ignore_list %} {{ k }}='{{ v }}'{% endfor %}>
-  {%- for sub1_key, sub1_value in dict|items if sub1_value is mapping and sub1_key not in ignore_list +%}
-  <{{ sub1_key }}{% for k, v in sub1_value|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
-    {%- for sub2_key, sub2_value in sub1_value|items if sub2_value is mapping +%}
-    <{{ sub2_key }}{% for k, v in sub2_value|items if v is not mapping%} {{ k }}='{{ v }}'{% endfor %}>
-      {%- for sub3_key, sub3_value in sub2_value|items if sub3_value is mapping +%}
-      <{{ sub3_key }}{% for k, v in sub3_value|items if v is not mapping%} {{ k }}='{{ v }}'{% endfor %}/>
-      {%- endfor +%}
-    </{{ sub2_key }}>
-    {%- endfor +%}
-  </{{ sub1_key }}>
+{#-
+  Render a dict as XML: scalar values become attributes, nested dicts become
+  child elements. The macro calls itself for each nested dict, so it works at
+  any depth. Keys in ignore_list are skipped at the top level, and the caller
+  is then responsible for the closing tag.
+-#}
+{%- macro dict_to_xml(name, data, ignore_list=[]) +%}
+<{{ name }}{% for k, v in data|items if v is not mapping and k not in ignore_list %} {{ k }}='{{ v }}'{% endfor %}>
+  {%- for k, v in data|items if v is mapping and k not in ignore_list +%}
+  {{ dict_to_xml(k, v) | trim | indent(2) }}
   {%- endfor +%}
-
-  {#- Check if there are ignored values that have to be handled separately and so also the closing root tag +#}
   {%- if ignore_list|length == 0 +%}
 </{{ name }}>
   {%- endif +%}
