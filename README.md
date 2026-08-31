@@ -10,6 +10,12 @@ The role can also be used to create and manage Libvirt networks, storage pools, 
 
 This role has to be executed as user 'root'.
 
+It uses the `community.libvirt` collection:
+
+```shell
+ansible-galaxy collection install -r requirements.yml
+```
+
 ## Tags
 
 Following tags are supported by this role:
@@ -25,6 +31,7 @@ Following tags are supported by this role:
 
 | Variable                                        | Type   | Required | Default | Comment                                                    |
 |-------------------------------------------------|--------|----------|---------|------------------------------------------------------------|
+| kvm_cloud_init_server                           | string | No       | -       | NoCloud cloud-init server URL for `kvm_vms` (see examples/vms) |
 | [kvm_networks](examples/networks)               | list() | No       | []      | Libvirt networks configuration                             |
 | [kvm_storage_pools](examples/storage/pools)     | list() | No       | []      | Libvirt storage pools configuration                        |
 | [kvm_storage_volumes](examples/storage/volumes) | list() | No       | []      | Libvirt storage volumes configuration                      |

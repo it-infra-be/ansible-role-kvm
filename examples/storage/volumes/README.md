@@ -1,6 +1,7 @@
 # Storage Volumes
 
-The 'kvm_storage_volumes' variable contains a list of storage volumes to create and/or resize.
+The 'kvm_storage_volumes' variable contains a list of storage volumes to create. An existing
+volume is grown when its configured capacity is larger than its current size.
 
 The storage volume configuration is based on the [Libvirt XML configuration](https://libvirt.org/formatstorage.html#storage-volume-xml).
 

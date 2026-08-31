@@ -37,6 +37,8 @@ disks:
 ```
 
 The disk volumes will be created together with the virtual machine, if no volume name is specified.
+Created volumes are always qcow2. For another format, create the volume in `kvm_storage_volumes`
+and reference it here by `name`.
 
 ### Root Disk
 
