@@ -76,7 +76,7 @@ kvm_storage_pools:
       protocol:
         ver: 3
     target:
-      path: /dev/disk/by-path
+      path: /var/lib/virt/images-nfs
 ```
 
 ### Target

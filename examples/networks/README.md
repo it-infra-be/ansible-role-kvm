@@ -196,12 +196,11 @@ kvm_networks:
         netmask: 255.255.255.0
     bandwidth:
       inbound:
-        avarage: 1000
+        average: 1000
         peak: 5000
         burst: 5120
-        floor: 256
       outbound:
-        avarage: 128
+        average: 128
         peak: 256
         burst: 256
 ```

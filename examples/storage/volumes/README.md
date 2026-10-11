@@ -49,7 +49,7 @@ kvm_storage_volumes:
       permissions:
         owner: 107
         group: 107
-        mode: 0744
+        mode: '0744'
         label: virt_image_t
 ```
 
