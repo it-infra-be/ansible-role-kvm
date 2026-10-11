@@ -127,8 +127,9 @@ kvm_networks:
       - family: ipv4
         address: 192.168.122.1
         netmask: 255.255.255.0
-        local_ptr: 'yes'
-        tftp: /tftp
+        localPtr: 'yes'
+        tftp:
+          root: /tftp
         dhcp:
           range:
             start: 192.168.122.100
@@ -145,7 +146,7 @@ kvm_networks:
       - family: ipv6
         address: 2001:db8:ca2:2::1
         prefix: 64
-        local_ptr: 'yes'
+        localPtr: 'yes'
         dhcp:
           range:
             start: 2001:db8:ca2:2::10

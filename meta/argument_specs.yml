@@ -77,7 +77,7 @@ argument_specs:
           ip:
             type: list
             elements: dict
-            description: One item per <ip> element. Each item can have a dhcp block (range, host, bootp).
+            description: One item per <ip> element. Each item can have a dhcp block (range, host, bootp) and a tftp block (root).
           route:
             type: list
             elements: dict

@@ -1,12 +1,18 @@
 # Changelog
 
-## [1.5.0] - 2026-08-30
+## [1.5.0] - 2026-10-12
+
+### Breaking Changes
+
+- Storage Volumes: the 'resize' key has been removed, volumes now grow automatically
+- Input Validation: keys the role does not support now stop the run at the start
 
 ### New Features
 
 - Input Validation: added role argument specs that check the provided variables before any task runs
 - Storage Volumes: a dry run (--check) now lists which volumes would be created or grown
 - Install: IOMMU now picks the Intel or AMD kernel flag based on the host CPU, and can be turned off with 'kvm_enable_iommu'
+- Networks: an 'ip' entry can now contain a 'tftp' block
 
 ### Bug Fixes
 
@@ -14,10 +20,10 @@
 - Networks: a DHCP host with a 'lease' no longer produces invalid XML
 - Networks: a 'dns' block no longer needs all four lists (forwarder, txt, srv, hosts); missing lists are skipped
 - Networks: DNS host names are no longer also written as an invalid 'hostname' attribute
+- Networks: DHCP 'lease' times are now applied correctly
 - Domains: nested dictionaries are now rendered at any depth
 - Virtual Machines: no longer fail when no volumes or domains are generated
 - Virtual Machines: the qcow2 'compat' setting is now placed under 'target', it was ignored under 'format'
-- Storage Volumes: existing volumes are now grown automatically when their configured capacity increases; the manual 'resize' key has been removed
 - Install: virt-host-validate warnings no longer abort the run; it now stops only on a real failure
 
 ### Other Changes
