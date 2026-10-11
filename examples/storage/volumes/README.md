@@ -23,7 +23,7 @@ kvm_storage_volumes:
 **Note:**  The 'pool' and 'from' keys are not part of the Libvirt XML file.
 These keys are needed during storage volume creation.
 
-The [storage_volumes.xml.j2](templates/storage_volumes.xml.j2) is used to convert each storage volume configuration to an XML file. 
+The [storage_volume.xml.j2](../../../templates/storage_volume.xml.j2) is used to convert each storage volume configuration to an XML file. 
 
 ## Examples
 

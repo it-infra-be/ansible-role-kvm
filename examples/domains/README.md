@@ -17,7 +17,7 @@ kvm_domains:
     maxMemory: string   # Run-time Maximum amount of memory that can be assigned to the virtual machine, incl. unit (OPTIONAL)
     currentMemory: string # Actual allocation of memory for the guest (by default same as memory), incl unit (OPTIONAL)
     memory_options: dict()    # Memory options, excl. unit (OPTIONAL)
-    maxMemory_options: dict() # maxMemroy options, excl. unit (OPTIONAL)
+    maxMemory_options: dict() # maxMemory options, excl. unit (OPTIONAL)
     vcpu: int             # Maximum number of virtual CPUs allocated to the virtual machine
     vcpu_options: dict()  # Virtual CPU Options (OPTIONAL)
     vcpus: list()         # Control state of individual virtual CPUs (OPTIONAL)
@@ -25,14 +25,14 @@ kvm_domains:
     filesystems: list() # Host directories and/or templates which can be accesses directly in the virtual machine (OPTIONAL) 
     interfaces: list()  # Network interfaces to attach to the virtual machine (OPTIONAL)
     os: dict()          # Virtual machine firmware options (OPTIONAL)
-    sysinfo: dict()     # Info to present to the guest via SMBIOS, can be used for cloud-init (OPTIONAL)
+    sysinfo: list()     # Info to present to the guest via SMBIOS, can be used for cloud-init (OPTIONAL)
 ```
 
-**Note:** The keys 'vcpu_options', 'memory_options' and 'mamMemory_options' are not directly available
+**Note:** The keys 'vcpu_options', 'memory_options' and 'maxMemory_options' are not directly available
 in the Libvirt XML file. These are used to specify the XML attributes of the 'vcpu', 'memory' and 'maxMemory'
 elements as these XML elements also have content.
 
-The [domain.xml.j2](templates/domain.xml.j2) is used to convert each domain configuration to an XML file. 
+The [domain.xml.j2](../../templates/domain.xml.j2) is used to convert each domain configuration to an XML file. 
 
 ## Examples
 
@@ -72,7 +72,7 @@ kvm_domains:
     vcpu: 2
     vcpu_options:
       placement: static
-      cpuset: '1-4, ^3,6'
+      cpuset: '1-4,^3,6'
       current: 1
     vcpus:
       - id: 0

@@ -25,7 +25,7 @@ kvm_networks:
     dns: dict()     # DNS Server setup for network, enabled by default! (OPTIONAL)
 ```
 
-The [network.xml.j2](templates/network.xml.j2) is used to convert each network configuration to an XML file. 
+The [network.xml.j2](../../templates/network.xml.j2) is used to convert each network configuration to an XML file. 
 
 ## Examples
 
@@ -68,7 +68,7 @@ kvm_networks:
         netmask: 255.255.255.0
     bridge:
       name: virbr0
-      stp: 'yes'
+      stp: 'on'
       delay: 5
       zone: libvirt
       macTableManager: libvirt
