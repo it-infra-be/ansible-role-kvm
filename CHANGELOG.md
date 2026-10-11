@@ -26,9 +26,7 @@
 - Virtual Machines: the qcow2 'compat' setting is now placed under 'target', it was ignored under 'format'
 - Install: virt-host-validate warnings no longer abort the run; it now stops only on a real failure
 
-### Other Changes
-
-- Added requirements.yml so the 'community.libvirt' collection can be installed with ansible-galaxy
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## [1.4.2] - 2025-05-03
 

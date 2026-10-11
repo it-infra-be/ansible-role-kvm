@@ -47,8 +47,9 @@ onto `kvm_storage_volumes` / `kvm_domains` via `set_fact`. Everything downstream
 sees the low-level lists.
 
 `kvm_vms` conventions: first disk becomes `<vm>-root.qcow2` (boot order 1, target `vda`);
-extra disks become `<vm>-data<N>.qcow2` (`vdb`, `vdc`, …). `disk.image` is used as a
-backing image (`virsh vol-create-from`) then resized to `disk.size`. EFI + secure boot and
+extra disks become `<vm>-data<N>.qcow2` (`vdb`, `vdc`, …). `disk.image` is copied into
+the new volume (`virsh vol-create-from`, a full copy, not a backing image) then resized to
+`disk.size`. EFI + secure boot and
 cloud-init (nocloud-net SMBIOS serial) are **on by default**, disabled per-VM with
 `efi: false` / `cloud_init: false`. Cloud-init injection also requires the
 `kvm_cloud_init_server` var to be set.
@@ -79,7 +80,9 @@ The libvirt schema URL is cited at the top of each template.
   `define` → `active` → `autostart` triad. `define` is idempotent.
 - Storage volumes (`tasks/storage_volumes.yml`): the module can't do what's needed, so this
   task gathers `virt_pool` facts and skips creation when
-  `item.name in ansible_libvirt_pools[item.pool].volumes`, then shells out to `virsh
+  `item.name in (ansible_libvirt_pools[item.pool]['volumes'] | default([]))` (the
+  `default` covers a pool that does not exist yet, e.g. one defined in the same `--check`
+  run), then shells out to `virsh
   vol-create` / `vol-create-from` / `vol-resize`. Volume XML is written to a tempfile that
   is deleted afterward. For existing volumes, `virsh vol-info --bytes` gives the current
   capacity; `vol-resize` runs only when the configured `capacity` (converted to bytes with
@@ -112,7 +115,9 @@ plain `WARN` (return code 1) no longer aborts the run.
 task runs — Ansible prepends the check automatically. It constrains only the keys the task
 files and templates dereference by name; the free-form nested structures the templates walk
 generically (network `forward`/`dns`/`source`, domain `disks`/`interfaces`, ...) are
-validated only as `dict` / `list of dict` so valid libvirt XML is never rejected. Validation
+validated only as `dict` / `list of dict` so valid libvirt XML is never rejected. The keys
+directly on a list entry are a closed set, though: an unknown key there (e.g. the removed
+`resize` on a volume) stops the run with "Unsupported parameters". Validation
 sees the user-supplied values, before `tasks/vms.yml` expands `kvm_vms`. Keep this file in
 sync whenever you change what a template accepts.
 
