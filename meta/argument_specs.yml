@@ -251,6 +251,8 @@ argument_specs:
             type: list
             elements: dict
             required: true
+            required_one_of:
+              - [name, size]
             description: Disks in boot order. The first disk is the boot disk (vda).
             options:
               pool:

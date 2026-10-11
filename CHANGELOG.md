@@ -16,6 +16,7 @@
 - Networks: DNS host names are no longer also written as an invalid 'hostname' attribute
 - Domains: nested dictionaries are now rendered at any depth
 - Virtual Machines: no longer fail when no volumes or domains are generated
+- Virtual Machines: the qcow2 'compat' setting is now placed under 'target', it was ignored under 'format'
 - Storage Volumes: existing volumes are now grown automatically when their configured capacity increases; the manual 'resize' key has been removed
 - Install: virt-host-validate warnings no longer abort the run; it now stops only on a real failure
 

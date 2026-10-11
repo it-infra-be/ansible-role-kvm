@@ -19,7 +19,7 @@ kvm_storage_volumes:
     target:
       format:
         type: qcow2
-        compat: 1.1
+      compat: 1.1
 
   # QCOW2 storage volume which uses a backingstore image
   - name: volume3.qcow2
@@ -28,7 +28,7 @@ kvm_storage_volumes:
     target:
       format:
         type: qcow2
-        compat: 1.1
+      compat: 1.1
     backingStore:
       path: /var/lib/virt/images/back.qcow2
       format:

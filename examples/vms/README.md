@@ -32,7 +32,7 @@ kvm_vms:
 disks:
   - pool: string  # Storage pool for disk volume
     name: string  # Name of already existing storage volume (optional, size and image are ignored)
-    size: string  # Volume size
+    size: string  # Volume size (required if no name is given)
     image: string # Copied source volume for new volume (optional)
 ```
 

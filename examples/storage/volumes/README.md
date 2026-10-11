@@ -63,7 +63,7 @@ kvm_storage_volumes:
     target:
       format:
         type: qcow2
-        compat: 1.1
+      compat: 1.1
     backingStore:
       path: /var/lib/virt/images/image.qcow2
       format:
