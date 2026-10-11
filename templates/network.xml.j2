@@ -48,17 +48,17 @@
   <!-- Addressing -->
   {%- if dns is defined +%}
   <dns{% for k, v in dns|items if v is string %} {{ k }}='{{ v }}'{% endfor %}>
-    {%- for dns_forwarder in dns.forwarder +%}
+    {%- for dns_forwarder in dns.forwarder | default([]) +%}
     <forwarder{% for k, v in dns_forwarder|items %} {{ k }}='{{ v }}'{% endfor %}/>
     {%- endfor +%}
-    {%- for dns_txt in dns.txt +%}
+    {%- for dns_txt in dns.txt | default([]) +%}
     <txt{% for k, v in dns_txt|items %} {{ k }}='{{ v }}'{% endfor %}/>
     {%- endfor +%}
-    {%- for dns_srv in dns.srv +%}
+    {%- for dns_srv in dns.srv | default([]) +%}
     <srv{% for k, v in dns_srv|items %} {{ k }}='{{ v }}'{% endfor %}/>
     {%- endfor +%}
-    {%- for dns_hosts in dns.hosts +%}
-    <host{% for k, v in dns_hosts|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
+    {%- for dns_hosts in dns.hosts | default([]) +%}
+    <host{% for k, v in dns_hosts|items if k != 'hostname' %} {{ k }}='{{ v }}'{% endfor %}>
       {%- for hostname in dns_hosts.hostname +%}
       <hostname>{{ hostname }}</hostname>
       {%- endfor +%}
@@ -83,7 +83,7 @@
       {%- for host in ip_item.dhcp.host +%}
       <host{% for k, v in host|items if k != 'lease' %} {{ k }}='{{ v }}'{% endfor %}>
         {%- if host.lease is defined +%}
-        <lease expire='{{ host.lease }}' unit='minutes'>
+        <lease expire='{{ host.lease }}' unit='minutes'/>
         {%- endif +%}
       </host>
       {%- endfor +%}

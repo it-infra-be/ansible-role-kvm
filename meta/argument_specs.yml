@@ -136,7 +136,7 @@ argument_specs:
           capacity:
             type: str
             description:
-              - Size as a number plus a unit, for example 20GiB. Use binary units (GiB, MiB) so it matches libvirt.
+              - Size as a number plus a unit, for example 20GiB. Units work as in libvirt. G and GiB are 1024-based, GB is 1000-based.
               - On a later run, a volume smaller than this is grown to match. It cannot be made smaller.
           allocation:
             type: str

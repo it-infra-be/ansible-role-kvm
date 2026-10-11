@@ -231,7 +231,7 @@ kvm_networks:
         netmask: 255.255.255.0
     dns:
       enable: 'yes'
-      forward_plain_names: 'no'
+      forwardPlainNames: 'no'
       forwarder:
         - addr: 8.8.8.8
           domain: example.com
@@ -239,7 +239,7 @@ kvm_networks:
         - name: example
           value: example value
       hosts:
-        - ip: 192.1468.122.2
+        - ip: 192.168.122.2
           hostname:
             - myhost
             - myhostalias

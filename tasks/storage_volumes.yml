@@ -13,7 +13,7 @@
   loop: '{{ kvm_storage_volumes | flatten(1) }}'
   loop_control:
     label: '{{ item.name }}'
-  when: item.name not in ansible_libvirt_pools[item.pool]['volumes']
+  when: item.name not in (ansible_libvirt_pools[item.pool]['volumes'] | default([]))
   register: __registered_libvirt_volume_files
 
 # Used copy instead of template in order to pass the loop dictionary (item)
@@ -84,7 +84,7 @@
     label: '{{ item.name }}'
   when:
     - item.capacity is defined
-    - item.name in ansible_libvirt_pools[item.pool]['volumes']
+    - item.name in (ansible_libvirt_pools[item.pool]['volumes'] | default([]))
   changed_when: false
   check_mode: false  # read-only, so run it during a dry run too
   register: __registered_libvirt_volume_info
@@ -99,7 +99,7 @@
     label: '{{ item.name }}'
   when:
     - ansible_check_mode
-    - item.name not in ansible_libvirt_pools[item.pool]['volumes']
+    - item.name not in (ansible_libvirt_pools[item.pool]['volumes'] | default([]))
 
 - name: List storage volumes that would be grown
   ansible.builtin.debug:
@@ -109,7 +109,10 @@
     label: '{{ item.item.name }}'
   vars:
     __current_capacity: '{{ item.stdout_lines | default([]) | select("match", "^Capacity:") | first | regex_replace("[^0-9]", "") | int }}'
-    __wanted_capacity: '{{ item.item.capacity | regex_replace("i", "") | human_to_bytes }}'
+    __wanted_capacity: >-
+      {%- set unit = item.item.capacity | string | regex_replace('[0-9 ]', '') | lower -%}
+      {{ (item.item.capacity | string | regex_replace('[^0-9]', '') | int)
+         * ((1000 if unit[1:] == 'b' else 1024) ** ('kmgtpe'.index(unit[0]) + 1) if unit not in ['', 'b', 'byte', 'bytes'] else 1) }}
   when:
     - ansible_check_mode
     - not (item.skipped | default(false))
@@ -128,10 +131,13 @@
   loop_control:
     label: '{{ item.item.name }}'
   vars:
-    # 'GiB' -> 'GB' so human_to_bytes (which rejects the IEC form) can read it;
-    # both it and libvirt then treat the suffix as binary (2^30).
+    # Convert 'capacity' to bytes with the same unit rules as libvirt:
+    # 'G' and 'GiB' are 1024-based, 'GB' is 1000-based, no unit means bytes.
     __current_capacity: '{{ item.stdout_lines | default([]) | select("match", "^Capacity:") | first | regex_replace("[^0-9]", "") | int }}'
-    __wanted_capacity: '{{ item.item.capacity | regex_replace("i", "") | human_to_bytes }}'
+    __wanted_capacity: >-
+      {%- set unit = item.item.capacity | string | regex_replace('[0-9 ]', '') | lower -%}
+      {{ (item.item.capacity | string | regex_replace('[^0-9]', '') | int)
+         * ((1000 if unit[1:] == 'b' else 1024) ** ('kmgtpe'.index(unit[0]) + 1) if unit not in ['', 'b', 'byte', 'bytes'] else 1) }}
   when:
     - not (item.skipped | default(false))
     - __wanted_capacity | int > __current_capacity | int

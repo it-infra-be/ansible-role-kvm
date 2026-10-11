@@ -85,4 +85,8 @@ On every run the role compares the configured `capacity` with the volume's real
 capacity (in bytes) and only calls `virsh vol-resize` when the volume is smaller.
 Runs where nothing changed report no change.
 
+Units work the same as in libvirt: `G` and `GiB` are 1024-based, `GB` is 1000-based,
+and a number without a unit is in bytes. So `20GB` is 20 000 000 000 bytes and `20GiB` is
+21 474 836 480 bytes.
+
 **Note:** It is not possible to shrink a volume; a lower `capacity` is ignored.
