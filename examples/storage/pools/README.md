@@ -17,7 +17,7 @@ kvm_storage_pools:
     target: {}  # Describes mapping of the storage pool into the host filesystem
 ```
 
-The [storage_pools.xml.j2](templates/storage_pools.xml.j2) is used to convert each storage pool configuration to an XML file. 
+The [storage_pool.xml.j2](../../../templates/storage_pool.xml.j2) is used to convert each storage pool configuration to an XML file. 
 
 ## Examples
 
@@ -76,7 +76,7 @@ kvm_storage_pools:
       protocol:
         ver: 3
     target:
-      path: /dev/disk/by-path
+      path: /var/lib/virt/images-nfs
 ```
 
 ### Target

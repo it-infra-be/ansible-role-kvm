@@ -25,7 +25,7 @@ kvm_networks:
     dns: dict()     # DNS Server setup for network, enabled by default! (OPTIONAL)
 ```
 
-The [network.xml.j2](templates/network.xml.j2) is used to convert each network configuration to an XML file. 
+The [network.xml.j2](../../templates/network.xml.j2) is used to convert each network configuration to an XML file. 
 
 ## Examples
 
@@ -68,7 +68,7 @@ kvm_networks:
         netmask: 255.255.255.0
     bridge:
       name: virbr0
-      stp: 'yes'
+      stp: 'on'
       delay: 5
       zone: libvirt
       macTableManager: libvirt
@@ -127,8 +127,9 @@ kvm_networks:
       - family: ipv4
         address: 192.168.122.1
         netmask: 255.255.255.0
-        local_ptr: 'yes'
-        tftp: /tftp
+        localPtr: 'yes'
+        tftp:
+          root: /tftp
         dhcp:
           range:
             start: 192.168.122.100
@@ -145,7 +146,7 @@ kvm_networks:
       - family: ipv6
         address: 2001:db8:ca2:2::1
         prefix: 64
-        local_ptr: 'yes'
+        localPtr: 'yes'
         dhcp:
           range:
             start: 2001:db8:ca2:2::10
@@ -195,12 +196,11 @@ kvm_networks:
         netmask: 255.255.255.0
     bandwidth:
       inbound:
-        avarage: 1000
+        average: 1000
         peak: 5000
         burst: 5120
-        floor: 256
       outbound:
-        avarage: 128
+        average: 128
         peak: 256
         burst: 256
 ```
@@ -231,7 +231,7 @@ kvm_networks:
         netmask: 255.255.255.0
     dns:
       enable: 'yes'
-      forward_plain_names: 'no'
+      forwardPlainNames: 'no'
       forwarder:
         - addr: 8.8.8.8
           domain: example.com
@@ -239,7 +239,7 @@ kvm_networks:
         - name: example
           value: example value
       hosts:
-        - ip: 192.1468.122.2
+        - ip: 192.168.122.2
           hostname:
             - myhost
             - myhostalias

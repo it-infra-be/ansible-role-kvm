@@ -5,4 +5,6 @@ kvm_storage_pools: []
 kvm_storage_volumes: []
 kvm_domains: []
 kvm_vms: []
+
+kvm_enable_iommu: true
 ...

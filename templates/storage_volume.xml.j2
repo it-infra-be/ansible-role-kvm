@@ -24,20 +24,20 @@
     </permissions>
     {%- endif +%}
     {%- if target.encryption is defined +%}
-    <encryption{% for k, v in target.encryption|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}'>
+    <encryption{% for k, v in target.encryption|items if v is not mapping %} {{ k }}='{{ v }}'{% endfor %}>
       {%- for sub1_key, sub1_value in target.encryption|items if sub1_value is mapping +%}
       <{{ sub1_key }}{% for k, v in sub1_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
       {%- endfor +%}
     </encryption>
     {%- endif +%}
     {%- if target.compat is defined +%}
-    <compat>'{{ target.compat }}'</compat>
+    <compat>{{ target.compat }}</compat>
     {%- endif +%}
     {%- if target.nocow is defined and target.nocow +%}
-    </nocow>
+    <nocow/>
     {%- endif +%}
     {%- if target.clusterSize is defined +%}
-    <clusterSize unit='{{ clusterSize | regex_replace('\d*') }}'>{{ clusterSize | regex_replace('\D*') }}</clusterSize>
+    <clusterSize unit='{{ target.clusterSize | regex_replace('\d*') }}'>{{ target.clusterSize | regex_replace('\D*') }}</clusterSize>
     {%- endif +%}
     {%- if target.features is defined +%}
     <features>

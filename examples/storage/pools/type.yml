@@ -14,7 +14,7 @@ kvm_storage_pools:
   # iSCSI based storage pool
   # Libvirt will manage the iSCSI connection
   # https://libvirt.org/storage.html#iscsi-pool
-  - name: virtimages
+  - name: virtimages-iscsi
     type: iscsi
     source:
       host:
@@ -32,7 +32,7 @@ kvm_storage_pools:
   # NFS based storage pool
   # Libvirt will manage the NFS connection
   # https://libvirt.org/storage.html#network-filesystem-pool
-  - name: virtimages
+  - name: virtimages-nfs
     type: netfs
     source:
       host:
@@ -44,5 +44,5 @@ kvm_storage_pools:
       protocol:
         ver: 3
     target:
-      path: /var/lib/virt/images
+      path: /var/lib/virt/images-nfs
 ...

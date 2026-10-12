@@ -32,11 +32,13 @@ kvm_vms:
 disks:
   - pool: string  # Storage pool for disk volume
     name: string  # Name of already existing storage volume (optional, size and image are ignored)
-    size: string  # Volume size
+    size: string  # Volume size (required if no name is given)
     image: string # Copied source volume for new volume (optional)
 ```
 
 The disk volumes will be created together with the virtual machine, if no volume name is specified.
+Created volumes are always qcow2. For another format, create the volume in `kvm_storage_volumes`
+and reference it here by `name`.
 
 ### Root Disk
 

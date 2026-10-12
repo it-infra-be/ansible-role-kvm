@@ -9,7 +9,7 @@
   <!-- Features -->
   <features>
     {%- for feature_key, feature_value in features|items +%}
-    <{{ feature_key }}{% for k, v in feature_value|items %} {{ k }}='{{ v }}'{% endfor %}'/>
+    <{{ feature_key }}{% for k, v in feature_value|items %} {{ k }}='{{ v }}'{% endfor %}/>
     {%- endfor +%}
   </features>
   {%- endif +%}
