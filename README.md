@@ -29,15 +29,15 @@ Following tags are supported by this role:
 
 ## Variables
 
-| Variable                                        | Type   | Required | Default | Comment                                                    |
-|-------------------------------------------------|--------|----------|---------|------------------------------------------------------------|
-| kvm_cloud_init_server                           | string | No       | -       | NoCloud cloud-init server URL for `kvm_vms` (see examples/vms) |
-| [kvm_networks](examples/networks)               | list() | No       | []      | Libvirt networks configuration                             |
-| [kvm_storage_pools](examples/storage/pools)     | list() | No       | []      | Libvirt storage pools configuration                        |
-| [kvm_storage_volumes](examples/storage/volumes) | list() | No       | []      | Libvirt storage volumes configuration                      |
-| [kvm_domains](examples/domains)                 | list() | No       | []      | Libvirt domains configuration                              |
-| [kvm_vms](examples/vms)                         | list() | No       | []      | Simplified way to create domains and their storage volumes |
-| kvm_enable_iommu                                | bool   | No       | true    | Add the IOMMU options to the kernel command line (PCI passthrough; needs a reboot) |
+| Variable                                        | Type    | Required   | Default  | Comment                                                                            |
+|-------------------------------------------------|---------|------------|----------|------------------------------------------------------------------------------------|
+| kvm_cloud_init_server                           | string  | No         | -        | NoCloud cloud-init server URL for `kvm_vms` (see examples/vms)                     |
+| [kvm_networks](examples/networks)               | list()  | No         | []       | Libvirt networks configuration                                                     |
+| [kvm_storage_pools](examples/storage/pools)     | list()  | No         | []       | Libvirt storage pools configuration                                                |
+| [kvm_storage_volumes](examples/storage/volumes) | list()  | No         | []       | Libvirt storage volumes configuration                                              |
+| [kvm_domains](examples/domains)                 | list()  | No         | []       | Libvirt domains configuration                                                      |
+| [kvm_vms](examples/vms)                         | list()  | No         | []       | Simplified way to create domains and their storage volumes                         |
+| kvm_enable_iommu                                | bool    | No         | true     | Add the IOMMU options to the kernel command line (PCI passthrough; needs a reboot) |
 
 **Note:** Click on a variable to see more information on how to use it.
 
